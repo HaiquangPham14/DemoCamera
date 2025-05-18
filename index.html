@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo Camera</title>
+    <title>Chụp Ảnh và Quay Video</title>
     <style>
         body {
             display: flex;
@@ -47,15 +47,6 @@
         button:hover {
             background-color: #21a1f1;
         }
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-            }
-            button {
-                font-size: 0.9em;
-                padding: 8px 15px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -76,8 +67,13 @@
         let chunks = [];
 
         async function startCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Lỗi truy cập camera: ", error);
+                alert("Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.");
+            }
         }
 
         // Mở camera ngay khi truy cập
@@ -110,6 +106,27 @@
             stopButton.style.display = 'none';
         };
 
+        // Hàm lưu ảnh vào IndexedDB
+        function saveImage(dataUrl) {
+            const request = indexedDB.open("myDatabase", 1);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                db.createObjectStore("images", { keyPath: "id" });
+            };
+
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction("images", "readwrite");
+                const store = transaction.objectStore("images");
+                const image = {
+                    id: Date.now(),
+                    data: dataUrl
+                };
+                store.add(image);
+            };
+        }
+
         document.getElementById('snap').onclick = () => {
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
@@ -118,11 +135,9 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/png');
 
-            // Tự động tải ảnh
-            const imgLink = document.createElement('a');
-            imgLink.href = dataUrl;
-            imgLink.download = 'photo.png';
-            imgLink.click();
+            // Lưu ảnh vào IndexedDB
+            saveImage(dataUrl);
+            alert("Ảnh đã được lưu vào bộ nhớ.");
         };
     </script>
 </body>
