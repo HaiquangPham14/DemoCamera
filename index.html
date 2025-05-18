@@ -4,54 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chụp Ảnh và Quay Video</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #282c34;
-            color: white;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        h1 {
-            margin-bottom: 20px;
-            font-size: 2.5em;
-            text-align: center;
-        }
-        video {
-            border: 3px solid #61dafb;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            width: 100%;
-            max-width: 640px;
-            height: auto;
-        }
-        button {
-            background-color: #61dafb;
-            color: black;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            width: 100%;
-            max-width: 200px;
-        }
-        button:hover {
-            background-color: #21a1f1;
-        }
-    </style>
 </head>
 <body>
     <h1>Chụp Ảnh và Quay Video</h1>
-    <video id="video" autoplay></video>
+    <video id="video" autoplay playsinline></video>
     <div>
         <button id="start">Bắt đầu Quay Video</button>
         <button id="stop" style="display:none;">Dừng Quay Video</button>
@@ -80,14 +36,13 @@
         startCamera();
 
         startButton.onclick = () => {
-            chunks = []; // Đặt lại dữ liệu đã ghi
+            chunks = [];
             mediaRecorder = new MediaRecorder(video.srcObject);
             mediaRecorder.ondataavailable = (event) => {
                 chunks.push(event.data);
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
-                // Tự động lưu video vào thư viện ảnh
                 saveFile(blob, 'video.webm');
             };
             mediaRecorder.start();
@@ -102,18 +57,18 @@
         };
 
         document.getElementById('snap').onclick = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const dataUrl = canvas.toDataURL('image/png');
+            setTimeout(() => {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL('image/png');
 
-            // Tự động lưu ảnh vào thư viện ảnh
-            saveFile(dataURLtoBlob(dataUrl), 'photo.png');
+                saveFile(dataURLtoBlob(dataUrl), 'photo.png');
+            }, 500);
         };
 
-        // Hàm chuyển đổi DataURL sang Blob
         function dataURLtoBlob(dataURL) {
             const byteString = atob(dataURL.split(',')[1]);
             const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
@@ -125,12 +80,11 @@
             return new Blob([ab], { type: mimeString });
         }
 
-        // Hàm lưu file vào thư viện ảnh
         function saveFile(blob, filename) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = filename;
-            link.click(); // Người dùng sẽ tự lưu file
+            link.click();
         }
     </script>
 </body>
