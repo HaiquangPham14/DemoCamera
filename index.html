@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Camera</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        video {
+            border: 3px solid #61dafb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+        }
+        button {
+            background-color: #61dafb;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 200px;
+        }
+        button:hover {
+            background-color: #21a1f1;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            button {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Chụp Ảnh và Quay Video</h1>
+    <video id="video" autoplay></video>
+    <div>
+        <button id="start">Bắt đầu Quay Video</button>
+        <button id="stop" style="display:none;">Dừng Quay Video</button>
+        <button id="snap">Chụp Ảnh</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const startButton = document.getElementById('start');
+        const stopButton = document.getElementById('stop');
+
+        let mediaRecorder;
+        let chunks = [];
+
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        }
+
+        // Mở camera ngay khi truy cập
+        startCamera();
+
+        startButton.onclick = () => {
+            chunks = []; // Đặt lại dữ liệu đã ghi
+            mediaRecorder = new MediaRecorder(video.srcObject);
+            mediaRecorder.ondataavailable = (event) => {
+                chunks.push(event.data);
+            };
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                // Tự động tải video
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'video.webm';
+                link.click();
+            };
+            mediaRecorder.start();
+            startButton.style.display = 'none';
+            stopButton.style.display = 'block';
+        };
+
+        stopButton.onclick = () => {
+            mediaRecorder.stop();
+            startButton.style.display = 'block';
+            stopButton.style.display = 'none';
+        };
+
+        document.getElementById('snap').onclick = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/png');
+
+            // Tự động tải ảnh
+            const imgLink = document.createElement('a');
+            imgLink.href = dataUrl;
+            imgLink.download = 'photo.png';
+            imgLink.click();
+        };
+    </script>
+</body>
+</html>
