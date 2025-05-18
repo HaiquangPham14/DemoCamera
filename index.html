@@ -11,20 +11,61 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #f0f0f0;
+            background-color: #282c34;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        video, canvas {
-            border: 1px solid black;
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        video {
+            border: 3px solid #61dafb;
+            border-radius: 8px;
             margin-bottom: 10px;
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+        }
+        button {
+            background-color: #61dafb;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 200px;
+        }
+        button:hover {
+            background-color: #21a1f1;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            button {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
         }
     </style>
 </head>
 <body>
     <h1>Chụp Ảnh và Quay Video</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <button id="start">Bắt đầu Quay Video</button>
-    <button id="stop" style="display:none;">Dừng Quay Video</button>
-    <button id="snap">Chụp Ảnh</button>
+    <video id="video" autoplay></video>
+    <div>
+        <button id="start">Bắt đầu Quay Video</button>
+        <button id="stop" style="display:none;">Dừng Quay Video</button>
+        <button id="snap">Chụp Ảnh</button>
+    </div>
 
     <script>
         const video = document.getElementById('video');
