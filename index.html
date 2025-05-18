@@ -87,13 +87,8 @@
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                
-                // Tự động tải video
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'video.webm';
-                link.click();
+                // Tự động lưu video vào thư viện ảnh
+                saveFile(blob, 'video.webm');
             };
             mediaRecorder.start();
             startButton.style.display = 'none';
@@ -106,27 +101,6 @@
             stopButton.style.display = 'none';
         };
 
-        // Hàm lưu ảnh vào IndexedDB
-        function saveImage(dataUrl) {
-            const request = indexedDB.open("myDatabase", 1);
-
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                db.createObjectStore("images", { keyPath: "id" });
-            };
-
-            request.onsuccess = (event) => {
-                const db = event.target.result;
-                const transaction = db.transaction("images", "readwrite");
-                const store = transaction.objectStore("images");
-                const image = {
-                    id: Date.now(),
-                    data: dataUrl
-                };
-                store.add(image);
-            };
-        }
-
         document.getElementById('snap').onclick = () => {
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
@@ -135,10 +109,29 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/png');
 
-            // Lưu ảnh vào IndexedDB
-            saveImage(dataUrl);
-            alert("Ảnh đã được lưu vào bộ nhớ.");
+            // Tự động lưu ảnh vào thư viện ảnh
+            saveFile(dataURLtoBlob(dataUrl), 'photo.png');
         };
+
+        // Hàm chuyển đổi DataURL sang Blob
+        function dataURLtoBlob(dataURL) {
+            const byteString = atob(dataURL.split(',')[1]);
+            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+
+        // Hàm lưu file vào thư viện ảnh
+        function saveFile(blob, filename) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click(); // Người dùng sẽ tự lưu file
+        }
     </script>
 </body>
 </html>
