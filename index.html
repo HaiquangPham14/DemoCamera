@@ -4,47 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chụp Ảnh và Quay Video</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        video, canvas {
+            border: 1px solid black;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Chụp Ảnh và Quay Video</h1>
-    <video id="video" autoplay playsinline></video>
-    <div>
-        <button id="start">Bắt đầu Quay Video</button>
-        <button id="stop" style="display:none;">Dừng Quay Video</button>
-        <button id="snap">Chụp Ảnh</button>
-    </div>
-    <div id="message" style="display:none;"></div>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="start">Bắt đầu Quay Video</button>
+    <button id="stop" style="display:none;">Dừng Quay Video</button>
+    <button id="snap">Chụp Ảnh</button>
 
     <script>
         const video = document.getElementById('video');
         const startButton = document.getElementById('start');
         const stopButton = document.getElementById('stop');
-        const message = document.getElementById('message');
 
         let mediaRecorder;
         let chunks = [];
 
         async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-            } catch (error) {
-                console.error("Lỗi truy cập camera: ", error);
-                alert("Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.");
-            }
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
         }
 
+        // Mở camera ngay khi truy cập
         startCamera();
 
         startButton.onclick = () => {
-            chunks = [];
+            chunks = []; // Đặt lại dữ liệu đã ghi
             mediaRecorder = new MediaRecorder(video.srcObject);
             mediaRecorder.ondataavailable = (event) => {
                 chunks.push(event.data);
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/webm' });
-                saveFile(blob, 'video.webm');
+                const url = URL.createObjectURL(blob);
+                
+                // Tự động tải video
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'video.webm';
+                link.click();
             };
             mediaRecorder.start();
             startButton.style.display = 'none';
@@ -58,38 +70,19 @@
         };
 
         document.getElementById('snap').onclick = () => {
-            setTimeout(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL('image/png');
-                saveFile(dataURLtoBlob(dataUrl), 'photo.png');
-            }, 500);
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/png');
+
+            // Tự động tải ảnh
+            const imgLink = document.createElement('a');
+            imgLink.href = dataUrl;
+            imgLink.download = 'photo.png';
+            imgLink.click();
         };
-
-        function dataURLtoBlob(dataURL) {
-            const byteString = atob(dataURL.split(',')[1]);
-            const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
-
-        function saveFile(blob, filename) {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-
-            // Hiển thị thông báo
-            message.textContent = `Đã tạo ${filename}. Vui lòng kiểm tra thư mục tải về của bạn.`;
-            message.style.display = 'block';
-        }
     </script>
 </body>
 </html>
