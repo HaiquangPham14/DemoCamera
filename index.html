@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chụp Ảnh và Quay Video</title>
+    <title>Demo Camera</title>
     <style>
         body {
             display: flex;
@@ -19,8 +19,8 @@
             box-sizing: border-box;
         }
         h1 {
-            margin-bottom: 20px; /* Giữ khoảng cách dưới tiêu đề */
-            font-size: 2.5em; /* Kích thước chữ */
+            margin-bottom: 20px;
+            font-size: 2.5em;
             text-align: center;
         }
         video {
@@ -28,7 +28,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             width: 100%;
-            max-width: 600px; /* Giảm kích thước video */
+            max-width: 600px;
             height: auto;
         }
         .button-container {
@@ -53,15 +53,10 @@
         button:hover {
             background-color: #21a1f1;
         }
-        @media (max-width: 600px) {
-            button {
-                font-size: 1em;
-            }
-        }
     </style>
 </head>
 <body>
-    <h1>Chụp Ảnh và Quay Video</h1>
+    <h1>Demo Camera</h1>
     <video id="video" autoplay playsinline></video>
     <div class="button-container">
         <button id="start">Bắt đầu Quay Video</button>
@@ -97,7 +92,7 @@
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/mp4' });
-                saveFile(blob, 'video.mp4', 'Video đã được lưu. Kiểm tra thư mục tải về.');
+                saveFile(blob, 'video.mp4');
             };
             mediaRecorder.start();
             startButton.style.display = 'none';
@@ -118,7 +113,7 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/png');
 
-            saveFile(dataURLtoBlob(dataUrl), 'photo.png', 'Ảnh đã được lưu. Kiểm tra thư mục tải về.');
+            saveFile(dataURLtoBlob(dataUrl), 'photo.png');
         };
 
         function dataURLtoBlob(dataURL) {
@@ -132,12 +127,11 @@
             return new Blob([ab], { type: mimeString });
         }
 
-        function saveFile(blob, filename, successMessage) {
+        function saveFile(blob, filename) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             link.click();
-            alert(successMessage);
         }
     </script>
 </body>
