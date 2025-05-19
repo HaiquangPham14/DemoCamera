@@ -28,7 +28,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             width: 100%;
-            max-width: 800px; /* Tăng kích thước video */
+            max-width: 800px;
             height: auto;
         }
         .button-container {
@@ -48,7 +48,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
             width: 100%;
-            max-width: 300px; /* Kích thước nút */
+            max-width: 300px;
         }
         button:hover {
             background-color: #21a1f1;
@@ -58,14 +58,6 @@
             font-size: 1em;
             display: none;
             text-align: center;
-        }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2em;
-            }
-            button {
-                font-size: 1em;
-            }
         }
     </style>
 </head>
@@ -108,7 +100,7 @@
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/mp4' });
-                saveFile(blob, 'video.mp4');
+                saveFile(blob, 'video.mp4', 'Video đã được lưu!');
             };
             mediaRecorder.start();
             startButton.style.display = 'none';
@@ -129,7 +121,7 @@
                 const context = canvas.getContext('2d');
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const dataUrl = canvas.toDataURL('image/png');
-                saveFile(dataURLtoBlob(dataUrl), 'photo.png');
+                saveFile(dataURLtoBlob(dataUrl), 'photo.png', 'Ảnh đã được lưu!');
             }, 500);
         };
 
@@ -144,15 +136,20 @@
             return new Blob([ab], { type: mimeString });
         }
 
-        function saveFile(blob, filename) {
+        function saveFile(blob, filename, successMessage) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             link.click();
 
             // Hiển thị thông báo
-            message.textContent = `Đã tạo ${filename}. Vui lòng kiểm tra thư mục tải về của bạn.`;
+            message.textContent = successMessage;
             message.style.display = 'block';
+
+            // Tự động ẩn thông báo sau 3 giây
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 3000);
         }
     </script>
 </body>
