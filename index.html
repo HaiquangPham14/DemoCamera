@@ -4,16 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chụp Ảnh và Quay Video</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #282c34;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-align: center;
+        }
+        video {
+            border: 3px solid #61dafb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px; /* Tăng kích thước video */
+            height: auto;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        button {
+            background-color: #61dafb;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 300px; /* Kích thước nút */
+        }
+        button:hover {
+            background-color: #21a1f1;
+        }
+        #message {
+            margin-top: 15px;
+            font-size: 1em;
+            display: none;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            button {
+                font-size: 1em;
+            }
+        }
+    </style>
 </head>
 <body>
     <h1>Chụp Ảnh và Quay Video</h1>
     <video id="video" autoplay playsinline></video>
-    <div>
+    <div class="button-container">
         <button id="start">Bắt đầu Quay Video</button>
         <button id="stop" style="display:none;">Dừng Quay Video</button>
         <button id="snap">Chụp Ảnh</button>
     </div>
-    <div id="message" style="display:none;"></div>
+    <div id="message"></div>
 
     <script>
         const video = document.getElementById('video');
