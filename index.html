@@ -117,7 +117,7 @@
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/mp4' });
-                saveFile(blob, 'video.mp4');
+                saveFile(blob, `Video${generateRandomNumber()}.mp4`); // Tên video ngẫu nhiên
             };
             mediaRecorder.start();
             startButton.style.display = 'none';
@@ -138,13 +138,17 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/png');
 
-            saveFile(dataURLtoBlob(dataUrl), 'photo.png');
+            saveFile(dataURLtoBlob(dataUrl), `Photo${generateRandomNumber()}.png`); // Tên ảnh ngẫu nhiên
         };
 
         toggleCameraButton.onclick = () => {
             facingMode = facingMode === "environment" ? "user" : "environment"; // Chuyển đổi giữa camera trước và sau
             startCamera(); // Khởi động lại camera với chế độ mới
         };
+
+        function generateRandomNumber() {
+            return Math.floor(Math.random() * 10000); // Tạo số ngẫu nhiên từ 0 đến 9999
+        }
 
         function dataURLtoBlob(dataURL) {
             const byteString = atob(dataURL.split(',')[1]);
