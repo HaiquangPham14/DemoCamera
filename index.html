@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo Camera</title>
+    <title>Chụp Ảnh và Quay Video</title>
     <style>
         body {
             display: flex;
@@ -23,12 +23,15 @@
             font-size: 2.5em;
             text-align: center;
         }
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Giữ nguyên kích thước khung video */
+        }
         video {
             border: 3px solid #61dafb;
             border-radius: 8px;
-            margin-bottom: 20px;
             width: 100%;
-            max-width: 600px;
             height: auto;
         }
         .button-container {
@@ -53,11 +56,28 @@
         button:hover {
             background-color: #21a1f1;
         }
+        .toggle-camera {
+            position: absolute;
+            bottom: 5px; /* Đặt sát góc dưới */
+            right: 5px;  /* Đặt sát góc phải */
+            border: none;
+            background: none; /* Không có nền */
+            cursor: pointer;
+            font-size: 1.5em; /* Kích thước biểu tượng */
+            width: 40px;  /* Đặt kích thước nút */
+            height: 40px; /* Đặt kích thước nút */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
-    <h1>Demo Camera</h1>
-    <video id="video" autoplay playsinline></video>
+    <h1>Chụp Ảnh và Quay Video</h1>
+    <div class="video-container">
+        <video id="video" autoplay playsinline></video>
+        <button class="toggle-camera" id="toggleCamera">🔄</button>
+    </div>
     <div class="button-container">
         <button id="start">Bắt đầu Quay Video</button>
         <button id="stop" style="display:none;">Dừng Quay Video</button>
@@ -68,13 +88,19 @@
         const video = document.getElementById('video');
         const startButton = document.getElementById('start');
         const stopButton = document.getElementById('stop');
+        const toggleCameraButton = document.getElementById('toggleCamera');
 
         let mediaRecorder;
         let chunks = [];
+        let currentStream;
+        let facingMode = "environment"; // Mặc định là camera sau
 
         async function startCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: { exact: facingMode } } 
+                });
+                currentStream = stream;
                 video.srcObject = stream;
             } catch (error) {
                 console.error("Lỗi truy cập camera: ", error);
@@ -86,7 +112,7 @@
 
         startButton.onclick = () => {
             chunks = [];
-            mediaRecorder = new MediaRecorder(video.srcObject, { mimeType: 'video/mp4' });
+            mediaRecorder = new MediaRecorder(currentStream, { mimeType: 'video/mp4' });
             mediaRecorder.ondataavailable = (event) => {
                 chunks.push(event.data);
             };
@@ -114,6 +140,11 @@
             const dataUrl = canvas.toDataURL('image/png');
 
             saveFile(dataURLtoBlob(dataUrl), 'photo.png');
+        };
+
+        toggleCameraButton.onclick = () => {
+            facingMode = facingMode === "environment" ? "user" : "environment"; // Chuyển đổi giữa camera trước và sau
+            startCamera(); // Khởi động lại camera với chế độ mới
         };
 
         function dataURLtoBlob(dataURL) {
