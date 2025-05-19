@@ -13,14 +13,14 @@
             height: 100vh;
             background-color: #282c34;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
         }
         h1 {
-            margin-bottom: 20px;
-            font-size: 2.5em;
+            margin-bottom: 20px; /* Giữ khoảng cách dưới tiêu đề */
+            font-size: 2.5em; /* Kích thước chữ */
             text-align: center;
         }
         video {
@@ -28,7 +28,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             width: 100%;
-            max-width: 800px;
+            max-width: 600px; /* Giảm kích thước video */
             height: auto;
         }
         .button-container {
@@ -53,11 +53,10 @@
         button:hover {
             background-color: #21a1f1;
         }
-        #message {
-            margin-top: 15px;
-            font-size: 1em;
-            display: none;
-            text-align: center;
+        @media (max-width: 600px) {
+            button {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -69,13 +68,11 @@
         <button id="stop" style="display:none;">Dừng Quay Video</button>
         <button id="snap">Chụp Ảnh</button>
     </div>
-    <div id="message"></div>
 
     <script>
         const video = document.getElementById('video');
         const startButton = document.getElementById('start');
         const stopButton = document.getElementById('stop');
-        const message = document.getElementById('message');
 
         let mediaRecorder;
         let chunks = [];
@@ -100,7 +97,7 @@
             };
             mediaRecorder.onstop = () => {
                 const blob = new Blob(chunks, { type: 'video/mp4' });
-                saveFile(blob, 'video.mp4', 'Video đã được lưu!');
+                saveFile(blob, 'video.mp4', 'Video đã được lưu. Kiểm tra thư mục tải về.');
             };
             mediaRecorder.start();
             startButton.style.display = 'none';
@@ -114,15 +111,14 @@
         };
 
         document.getElementById('snap').onclick = () => {
-            setTimeout(() => {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL('image/png');
-                saveFile(dataURLtoBlob(dataUrl), 'photo.png', 'Ảnh đã được lưu!');
-            }, 500);
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/png');
+
+            saveFile(dataURLtoBlob(dataUrl), 'photo.png', 'Ảnh đã được lưu. Kiểm tra thư mục tải về.');
         };
 
         function dataURLtoBlob(dataURL) {
@@ -141,15 +137,7 @@
             link.href = URL.createObjectURL(blob);
             link.download = filename;
             link.click();
-
-            // Hiển thị thông báo
-            message.textContent = successMessage;
-            message.style.display = 'block';
-
-            // Tự động ẩn thông báo sau 3 giây
-            setTimeout(() => {
-                message.style.display = 'none';
-            }, 3000);
+            alert(successMessage);
         }
     </script>
 </body>
